@@ -17,55 +17,19 @@ function easy_size_chart_init() {
     add_action('woocommerce_process_product_meta', 'save_custom_product_field');
     add_filter('woocommerce_product_tabs', 'add_custom_tab_with_field');
     wp_enqueue_style(
-        'easy-size-chart-style', // Unikalny identyfikator
-        plugin_dir_url(__FILE__) . 'css/style.css', // Ścieżka do pliku CSS
-        array(), // Brak zależności
-        '1.0', // Wersja
-        'all' // Gdzie ładować (all, screen, print)
+        'easy-size-chart-style',
+        plugin_dir_url(__FILE__) . 'style.css', // CSS file path
+        array(),                                // Dependencies (none)
+        '1.0',                                  // Version
+        'all'
     );
-    add_action('admin_footer', function() {
-        ?>
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                var mediaUploader;
-
-                document.querySelector(".upload_image_button").addEventListener("click", function(e) {
-                    e.preventDefault();
-
-                    var inputField = document.getElementById("_easy_size_chart_image_field");
-
-                    if (!inputField) {
-                        console.error("Image path field not found!");
-                        return;
-                    }
-
-                    // Jeśli modal już istnieje, otwórz go ponownie
-                    if (mediaUploader) {
-                        mediaUploader.open();
-                        return;
-                    }
-
-                    // Tworzenie okna Media Library
-                    mediaUploader = wp.media({
-                        title: "Choose an Image",
-                        button: { text: "Use this image" },
-                        multiple: false
-                    });
-
-                    // Obsługa wyboru obrazu
-                    mediaUploader.on("select", function() {
-                        var attachment = mediaUploader.state().get("selection").first().toJSON();
-                        inputField.value = attachment.url; // Wpisanie wartości do pola
-                        inputField.dispatchEvent(new Event("change")); // Wymuszenie odświeżenia WooCommerce
-                    });
-
-                    // Otwórz modal
-                    mediaUploader.open();
-                });
-            });
-        </script>
-        <?php
-    });
+    wp_enqueue_script(
+        'easy-size-chart-script', 
+        plugin_dir_url(__FILE__) . 'script.js', // Path
+        array('jquery'),                        // Dependencies
+        '1.0',                                  // Version
+        true                                    // Loading in footer (true / false)
+    );
 }
 add_action('plugins_loaded', 'easy_size_chart_init');
 
