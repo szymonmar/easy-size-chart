@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Easy Size Chart
  * Description: Easy size charts for Woocommerce product pages
- * Version: 1.1
+ * Version: 1.2.0
  * Author: Szymon Marszałek
  * License: GPL2
  */
