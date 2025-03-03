@@ -18,3 +18,29 @@
         gap: 30px;
     }
 }
+.invisible_field {
+    display: none !important;
+}
+.size_chart_builder_module {
+    margin: 9px 0px;
+    padding: 5px 20px 5px 20px;
+}
+.size_chart_builder_toolbar {
+    margin: 9px 0px;
+    padding: 5px 20px 5px 30px !important;
+}
+p.easy_size_chart_cell {
+    margin: 5px !important;
+    padding: 0px !important;
+}
+.button-secondary.delete {
+    color: #c90f0f !important;
+    border-color: #c90f0f !important;
+}
+p.easy_size_chart_frontend_cell_content {
+    margin: 0px !important;
+    text-align: center;
+}
+.easy_size_chart_frontend_table {
+    table-layout: fixed;
+}
