@@ -66,17 +66,31 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        if(rowIncrement > 0 && rowCountField.value >= 10) {
+        let currentRowCount = parseInt(rowCountField.value);
+        let currentColCount = parseInt(colCountField.value);
+
+        if(rowIncrement > 0 && currentRowCount >= 10) {
             return;
         }
-        if(colIncrement > 0 && colCountField.value >= 10) {
+        if(colIncrement > 0 && currentColCount >= 10) {
             return;
         }
-        if(rowIncrement < 0 && rowCountField.value <= 1) {
+        if(rowIncrement < 0 && currentRowCount <= 1) {
             return;
         }
-        if(colIncrement < 0 && colCountField.value <= 1) {
+        if(colIncrement < 0 && currentColCount <= 1) {
             return;
+        }
+
+        // Reading data from the table
+        let tableData = {};
+        for (let row = 0; row < currentRowCount; row++) {
+            for (let col = 0; col < currentColCount; col++) {
+                let input = document.querySelector(`input[name='R${row}C${col}']`);
+                if (input) {
+                    tableData[`R${row}C${col}`] = input.value;
+                }
+            }
         }
             
         let newRowCount = parseInt(rowCountField.value) + rowIncrement;
@@ -93,6 +107,7 @@ document.addEventListener("DOMContentLoaded", function() {
         formData.append("post_id", document.getElementById("post_ID").value);
         formData.append("row_count", newRowCount);
         formData.append("column_count", newColCount);
+        formData.append("table_data", JSON.stringify(tableData));
 
         fetch(ajaxurl, {
             method: "POST",

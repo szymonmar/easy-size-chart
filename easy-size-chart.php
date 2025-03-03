@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Easy Size Chart
  * Description: Easy size charts for Woocommerce product pages
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Szymon Marszałek
  * License: GPL2
  */
@@ -160,28 +160,29 @@ add_action('woocommerce_product_data_panels', function() {
     echo '<a href="#" class="button-secondary delete delete_row_button">' . __('Delete row', 'woocommerce') . '</a>   ';
     echo '<a href="#" class="button-secondary delete delete_column_button">' . __('Delete column', 'woocommerce') . '</a>';
     echo '</p><div class="size_chart_builder_module" id="_easy_size_chart_table">';
-    echo render_size_chart_panel($g_row_count, $g_col_count);
+    echo render_size_chart_panel($g_row_count, $g_col_count, $g_chart_data);
     echo '</div></div>';
 });
 
 // Modifies table size when add/remove row/column button is clicked
 function modify_global_table_size() {
-    global $g_row_count, $g_col_count, $g_chart_data;
-    if (!isset($_POST['post_id'], $_POST['row_count'], $_POST['column_count'])) {
+    global $g_row_count, $g_col_count;
+    if (!isset($_POST['post_id'], $_POST['row_count'], $_POST['column_count'], $_POST['table_data'])) {
         wp_send_json_error(['message' => 'Brak wymaganych danych']);
     }
     $g_row_count = intval($_POST['row_count']);
     $g_col_count = intval($_POST['column_count']);
-    $g_chart_data  = get_post_meta($_POST['post_id'], '_easy_size_chart_data', true);
+    $data = json_decode(stripslashes($_POST['table_data']), true);
 
-    $new_table_html = render_size_chart_panel($g_row_count, $g_col_count);
+
+    $new_table_html = render_size_chart_panel($g_row_count, $g_col_count, $data);
 
     wp_send_json_success(['table_html' => $new_table_html]);
 }
 
 // Renders backend builder panel
-function render_size_chart_panel($rows, $cols) {
-    global $g_chart_data;
+function render_size_chart_panel($rows, $cols, $data) {
+
     $content = '<table><tbody>';
     for($row = 0; $row < intval($rows); $row++) {
         $content .= '<tr>';
@@ -189,7 +190,7 @@ function render_size_chart_panel($rows, $cols) {
             $id = 'R' . $row . 'C' . $col;
             $content .= '<td>';
             $content .= '<p class="easy_size_chart_cell ' . esc_attr($id) . '_field">';
-            $content .= '<input type="text" name="' .  esc_attr($id) . '" style="width: 100%" id="' . esc_attr($id) . '" value="' . esc_attr($g_chart_data[$id]) . '" /></p>';
+            $content .= '<input type="text" name="' .  esc_attr($id) . '" style="width: 100%" id="' . esc_attr($id) . '" value="' . esc_attr($data[$id]) . '" /></p>';
             $content .= '</td>';
         }
         $content .= '</tr>';
@@ -277,7 +278,6 @@ function add_custom_tab_with_field($tabs) {
     }
     return $tabs;
 }
-
 
 // Displays size chart on the product page in the size chart tab
 function easy_size_chart_tab_callback() {
