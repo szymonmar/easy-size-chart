@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Easy Size Chart
  * Description: Easy size charts for Woocommerce product pages
- * Version: 1.2.1
+ * Version: 1.2.2
  * Author: Szymon Marszałek
  * License: GPL2
  */
@@ -22,7 +22,7 @@ function easy_size_chart_init() {
         'easy-size-chart-style',
         plugin_dir_url(__FILE__) . 'style.css', // CSS file path
         array(),                                // Dependencies (none)
-        '1.5',                                  // Version
+        '1.6',                                  // Version
         'all'
     );
     wp_enqueue_script(
@@ -319,7 +319,7 @@ function easy_size_chart_tab_callback() {
         if($image_enabled == 'yes') {
             $image_path = get_post_meta($post->ID, '_easy_size_chart_image_path', true);
             echo '<div class="easy_size_chart_wrapper">';
-            echo '<div class="esc_table_wrapper">';
+            echo '<div class="easy_size_chart_table_wrapper">';
             echo render_size_chart_output();
             echo '</div><div class="esc_guide_image_wrapper">';
             echo '<img src="' . $image_path . '"></div></div>';

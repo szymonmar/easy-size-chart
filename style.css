@@ -4,9 +4,9 @@
     flex-direction: column-reverse;
     gap: 20px;
 }
-.esc_table_wrapper {
+.easy_size_chart_table_wrapper {
     width: 100%;
-    display: flex;
+    display: block;
 }
 .esc_guide_image_wrapper {
     width: 100%;
