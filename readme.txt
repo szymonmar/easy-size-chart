@@ -4,7 +4,7 @@ Tags: woocommerce, table, size chart, size chart for woocommerce, product size, 
 Requires at least: 5.0  
 Tested up to: 6.7.2  
 Requires PHP: 7.4  
-Stable tag: 1.2.3  
+Stable tag: 2.0  
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -38,6 +38,11 @@ Yes! You can enter a TablePress shortcode instead of using the built-in table ed
 
 = Does this plugin work with all themes? =
 It should work with most WooCommerce-compatible themes. If you experience any styling issues, you may need to adjust your CSS.
+
+== Changelog ==
+
+= 2.0 =
+* Added global setting for size chart tab title and fallback text
 
 = 1.2 =
 * Improved compatibility with WordPress 6.4 and WooCommerce latest version.

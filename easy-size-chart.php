@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Easy Size Chart
  * Description: Easy size charts for Woocommerce product pages
- * Version: 1.2.3
+ * Version: 2.0
  * Author: Szymon Marszałek
  * License: GPL2
  */
@@ -51,7 +51,7 @@ add_action('admin_menu', 'easy_size_chart_add_woocommerce_menu', 99);
 // Function displaying the settings page
 function easy_size_chart_settings_page() {
     ?>
-    <div class="wrap">
+    <div class="easy-size-chart-settings-wrap">
         <h1>Easy Size Chart Options</h1>
         <form method="post" action="options.php">
             <?php
@@ -95,13 +95,13 @@ add_action('admin_init', 'easy_size_chart_register_settings');
 
 function easy_size_chart_tab_title_callback() {
     $tab_title = get_option('easy_size_chart_tab_title', '');
-    echo '<input type="text" name="easy_size_chart_tab_title" value="' . esc_attr($tab_title) . '" />';
+    echo '<input type="text" class="easy-size-chart-settings-input" name="easy_size_chart_tab_title" value="' . esc_attr($tab_title) . '" />';
     echo '<p class="description">Enter title of size chart tab on the product site.</p>';
 }
 
 function easy_size_chart_fallback_callback() {
     $fallback = get_option('easy_size_chart_fallback_text', '');
-    echo '<input type="text" name="easy_size_chart_fallback_text" value="' . esc_attr($fallback) . '" />';
+    echo '<input type="text" class="easy-size-chart-settings-input" name="easy_size_chart_fallback_text" value="' . esc_attr($fallback) . '" />';
     echo '<p class="description">Enter text You want to display in the size chart tab when size chart is not specified.</p>';
 }
 

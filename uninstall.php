@@ -4,16 +4,10 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
     exit;
 }
 
-// Deleting db table
-global $wpdb;
-$table_name = $wpdb->prefix . 'easy_size_chart';
-$wpdb->query("DROP TABLE IF EXISTS $table_name");
 
 // Delete custom product fields
 delete_post_meta_by_key('_easy_size_chart_enabled');
 delete_post_meta_by_key('_easy_size_chart_image_enabled');
-delete_post_meta_by_key('_easy_size_chart_tab_title');
-delete_post_meta_by_key('_easy_size_chart_unspecified_text');
 delete_post_meta_by_key('_easy_size_chart_tablepress_shortcode');
 delete_post_meta_by_key('_easy_size_chart_image_path');
 delete_post_meta_by_key('_easy_size_chart_row_count');

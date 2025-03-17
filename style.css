@@ -17,6 +17,9 @@
         flex-direction: row;
         gap: 30px;
     }
+    .easy-size-chart-settings-input {
+        width: 450px;
+    }
 }
 .invisible_field {
     display: none !important;
