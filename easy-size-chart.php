@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Easy Size Chart
  * Description: Easy size charts for Woocommerce product pages
- * Version: 1.2.3
+ * Version: 2.0
  * Author: Szymon Marszałek
  * License: GPL2
  */
@@ -35,6 +35,77 @@ function easy_size_chart_init() {
 }
 add_action('plugins_loaded', 'easy_size_chart_init');
 
+// Adding submenu to Woocommerce section
+function easy_size_chart_add_woocommerce_menu() {
+    add_submenu_page(
+        'woocommerce',           
+        'Easy Size Chart',            
+        'Easy Size Chart',                 
+        'manage_options',              
+        'easy-size-chart-settings',                
+        'easy_size_chart_settings_page'                                  
+    );
+}
+add_action('admin_menu', 'easy_size_chart_add_woocommerce_menu', 99);
+
+// Function displaying the settings page
+function easy_size_chart_settings_page() {
+    ?>
+    <div class="easy-size-chart-settings-wrap">
+        <h1>Easy Size Chart Options</h1>
+        <form method="post" action="options.php">
+            <?php
+            settings_fields('easy_size_chart_options_group');
+            do_settings_sections('easy-size-chart-settings');
+            submit_button();
+            ?>
+        </form>
+    </div>
+    <?php
+}
+
+function easy_size_chart_register_settings() {
+    register_setting('easy_size_chart_options_group', 'easy_size_chart_tab_title');
+    register_setting('easy_size_chart_options_group', 'easy_size_chart_fallback_text');
+
+    add_settings_section(
+        'easy_size_chart_main_section',
+        'Main settings',
+        null,
+        'easy-size-chart-settings'
+    );
+
+    add_settings_field(
+        'easy_size_chart_tab_title_field',
+        'Tab title',
+        'easy_size_chart_tab_title_callback',
+        'easy-size-chart-settings',
+        'easy_size_chart_main_section'
+    );
+
+    add_settings_field(
+        'easy_size_chart_fallback_text_field',
+        'Fallback text',
+        'easy_size_chart_fallback_callback',
+        'easy-size-chart-settings',
+        'easy_size_chart_main_section'
+    );
+}
+add_action('admin_init', 'easy_size_chart_register_settings');
+
+function easy_size_chart_tab_title_callback() {
+    $tab_title = get_option('easy_size_chart_tab_title', '');
+    echo '<input type="text" class="easy-size-chart-settings-input" name="easy_size_chart_tab_title" value="' . esc_attr($tab_title) . '" />';
+    echo '<p class="description">Enter title of size chart tab on the product site.</p>';
+}
+
+function easy_size_chart_fallback_callback() {
+    $fallback = get_option('easy_size_chart_fallback_text', '');
+    echo '<input type="text" class="easy-size-chart-settings-input" name="easy_size_chart_fallback_text" value="' . esc_attr($fallback) . '" />';
+    echo '<p class="description">Enter text You want to display in the size chart tab when size chart is not specified.</p>';
+}
+
+
 // Adds Easy Size Chart options on the Woocommerce edit product page
 add_filter('woocommerce_product_data_tabs', function($tabs) {
     $tabs['easy_size_chart'] = array(
@@ -51,11 +122,6 @@ add_action('woocommerce_product_data_panels', function() {
     global $post;
 
     // Getting data from the database
-    $tab_title = empty(get_post_meta($post->ID, '_easy_size_chart_tab_title', true))
-                    ? 'Size chart' : get_post_meta($post->ID, '_easy_size_chart_tab_title', true);
-    $unspecified_text = empty(get_post_meta($post->ID, '_easy_size_chart_unspecified_text', true)) 
-                        ? 'Size chart is not specified for this product.' 
-                        : get_post_meta($post->ID, '_easy_size_chart_unspecified_text', true);
     $tablepress_shortcode = get_post_meta($post->ID, '_easy_size_chart_tablepress_shortcode', true);
     $enabled = get_post_meta($post->ID, '_easy_size_chart_enabled', true);
     $image_enabled = get_post_meta($post->ID, '_easy_size_chart_image_enabled', true);
@@ -76,14 +142,6 @@ add_action('woocommerce_product_data_panels', function() {
         'label'       => __('Activate size chart', 'woocommerce'),
         'description' => __('Select to activate size chart for this product', 'woocommerce'),
         'value'       => $enabled === 'yes' ? 'yes' : 'no',
-    ));
-    // Size chart tab title
-    woocommerce_wp_text_input(array(
-        'id'          => '_easy_size_chart_tab_title_field',
-        'label'       => __('Tab title', 'woocommerce'),
-        'description' => __('Enter title of size chart tab on the product site', 'woocommerce'),
-        'desc_tip'    => true,
-        'value'       => $tab_title,
     ));
     echo '</p><hr><p class="form-field">';
     // Enable sizing guide image
@@ -118,14 +176,6 @@ add_action('woocommerce_product_data_panels', function() {
         'description' => __('Copy size chart\'s short code from TablePress and paste it here', 'woocommerce'),
         'desc_tip'    => true,
         'value'       => $tablepress_shortcode,
-    ));
-    // Size chart unspecified fallback text
-    woocommerce_wp_text_input(array(
-        'id'          => '_easy_size_chart_unspecified_text_field',
-        'label'       => __('Fallback text', 'woocommerce'),
-        'description' => __('Enter text You want to display in the size chart tab when size chart is not specified.', 'woocommerce'),
-        'desc_tip'    => true,
-        'value'       => $unspecified_text,
     ));
     echo '</p><hr><div class="invisible_field">';
     woocommerce_wp_text_input(array(
@@ -222,8 +272,6 @@ function render_size_chart_output() {
 // Saves custom field content on product update
 function save_custom_product_field($post_id) {
     $tablepress_shortcode = isset($_POST['_easy_size_chart_tablepress_shortcode_field']) ? sanitize_text_field($_POST['_easy_size_chart_tablepress_shortcode_field']) : '';
-    $tab_title = isset($_POST['_easy_size_chart_tab_title_field']) ? sanitize_text_field($_POST['_easy_size_chart_tab_title_field']) : '';
-    $unspecified_text = isset($_POST['_easy_size_chart_unspecified_text_field']) ? sanitize_text_field($_POST['_easy_size_chart_unspecified_text_field']) : '';
     $image_path = isset($_POST['_easy_size_chart_image_field']) ? sanitize_text_field($_POST['_easy_size_chart_image_field']) : '';
     $easy_chart_enabled = isset($_POST['_easy_size_chart_enabled_cb']) ? 'yes': 'no';
     $image_enabled = isset($_POST['_easy_size_chart_image_enabled_cb']) ? 'yes': 'no';
@@ -238,8 +286,6 @@ function save_custom_product_field($post_id) {
     }
     update_post_meta($post_id, '_easy_size_chart_enabled', $easy_chart_enabled);
     update_post_meta($post_id, '_easy_size_chart_image_enabled', $image_enabled);
-    update_post_meta($post_id, '_easy_size_chart_tab_title', $tab_title);
-    update_post_meta($post_id, '_easy_size_chart_unspecified_text', $unspecified_text);
     update_post_meta($post_id, '_easy_size_chart_tablepress_shortcode', $tablepress_shortcode);
     update_post_meta($post_id, '_easy_size_chart_image_path', $image_path);
     update_post_meta($post_id, '_easy_size_chart_row_count', $row_count);
@@ -254,7 +300,7 @@ function add_custom_tab_with_field($tabs) {
     global $post;
     $easy_chart_enabled = get_post_meta($post->ID, '_easy_size_chart_enabled', true);
     if($easy_chart_enabled == 'yes') {
-        $tab_title = get_post_meta($post->ID, '_easy_size_chart_tab_title', true);
+        $tab_title = get_option('easy_size_chart_tab_title', '');
         // Adding a new tab
         if(!empty($tab_title)) {
             $tabs['custom_tab'] = array(
@@ -283,7 +329,7 @@ function easy_size_chart_tab_callback() {
     $shortcode_enabled = get_post_meta($post->ID, '_easy_size_chart_shortcode_enabled', true);
     // if table from shortcode
     if ($shortcode_enabled == 'yes' && !empty($tablepress_shortcode)) {
-        $tab_title = get_post_meta($post->ID, '_easy_size_chart_tab_title', true);
+        $tab_title = get_option('easy_size_chart_tab_title', '');
         if(!empty($tab_title)) {
             echo '<h4>' . $tab_title . '</h4><br>';
         } else {
@@ -304,7 +350,7 @@ function easy_size_chart_tab_callback() {
         }
         // if table from Easy Size Chart builder
     } else if($shortcode_enabled =='no') {
-        $tab_title = get_post_meta($post->ID, '_easy_size_chart_tab_title', true);
+        $tab_title = get_option('easy_size_chart_tab_title', '');
         if(!empty($tab_title)) {
             echo '<h4>' . $tab_title . '</h4><br>';
         } else {
@@ -324,9 +370,9 @@ function easy_size_chart_tab_callback() {
             echo '</div>';
         }
     } else {
-        $unspecified_text = get_post_meta($post->ID, '_easy_size_chart_unspecified_text', true);
-        if(!empty($unspecified_text)) {
-            echo '<p>' . __($unspecified_text, 'woocommerce') . '</p>';
+        $fallback = get_option('easy_size_chart_fallback_text', '');
+        if(!empty($fallback)) {
+            echo '<p>' . __($fallback, 'woocommerce') . '</p>';
         } else {
             echo '<p>' . __('Size chart is not specified for this product.', 'woocommerce') . '</p>';
         }
