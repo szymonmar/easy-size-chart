@@ -12,6 +12,29 @@ if (!defined('ABSPATH')) {
     die('No direct script access allowed!');
 }
 
+// Creating db table
+function easy_size_chart_create_table() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . "easy_size_chart"; // Dodaj prefiks WP
+
+    $charset_collate = $wpdb->get_charset_collate();
+
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        tab_title varchar(255) NOT NULL,
+        fallback_text text NOT NULL,
+        created_at datetime DEFAULT current_timestamp NOT NULL,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    dbDelta($sql);
+}
+
+// Uruchomienie funkcji przy aktywacji wtyczki
+register_activation_hook(__FILE__, 'easy_size_chart_create_table');
+
+
 // Actions & filters initialization
 function easy_size_chart_init() {
     add_action('woocommerce_process_product_meta', 'save_custom_product_field');
